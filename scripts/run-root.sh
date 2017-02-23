@@ -36,7 +36,7 @@ while true; do
             ssmtp "${MAIL_TO}" << EOF
 To: ${MAIL_TO}
 From: ${MAIL_FROM}
-Subject: [Docker Alert] ${name}
+Subject: ${MAIL_PREFIX}${name}
 
 Event: ${status} ${exitCode}
 Container: ${name}
