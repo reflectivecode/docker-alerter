@@ -24,10 +24,18 @@ while true; do
         if [[ "${status}" == "attach" ]]; then
             continue
         fi
+
         name=`echo "${line}" | jq .Actor.Attributes.name -r`
         image=`echo "${line}" | jq .Actor.Attributes.image -r`
         exitCode=`echo "${line}" | jq .Actor.Attributes.exitCode -r`
         json=`echo "${line}" | jq '.'`
+
+        if [[ "${status}" == "die" ]]; then
+            logs="$(curl --silent --show-error --unix-socket /var/run/docker.sock "http:/v1.24/containers/${name}/logs?stdout=1&stderr=1&timestamps=1&since=$(($(date +%s)-60))")"
+        else
+            logs=""
+        fi
+
         if [[ "${exitCode}" == "null" ]]; then
             exitCode=""
         else
@@ -43,6 +51,8 @@ Container: ${name}
 Image: ${image}
 
 ${json}
+
+${logs}
 EOF
     done
 done
